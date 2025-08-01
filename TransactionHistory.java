@@ -6,37 +6,41 @@ import java.io.IOException;
 
 public class TransactionHistory {
 
+	public static void displayTransactionHistory(int userId, int accountNo) {
+	    System.out.println("Reading transaction history for userId: " + userId + ", accountNo: " + accountNo);
+	    try (BufferedReader reader = new BufferedReader(new FileReader("transaction_history.txt"))) {
+	        String line;
+	        boolean found = false;
 
-    public static void displayTransactionHistory(int accountNo) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("transaction_history.txt"))) {
-            String line;
-            boolean foundTransactions = false;
+	        System.out.println("\nTransaction History for Account: " + accountNo);
+	        while ((line = reader.readLine()) != null) {
+	           
+	            String[] fields = line.split(",");
+	            if (fields.length < 6) continue;
 
-            System.out.println("\nTransaction History for Account: " + accountNo);
-            while ((line = reader.readLine()) != null) {
-                String[] fields = line.split(",");
-                int loggedAccountNo = Integer.parseInt(fields[0]);
-                
-               
-                if (loggedAccountNo == accountNo) {
-                    String transactionType = fields[1];
-                    double amount = Double.parseDouble(fields[2]);
-                    String date = fields[3];
-                    String status = fields[4];
+	            int logUserId = Integer.parseInt(fields[0]);
+	            int logAccountNo = Integer.parseInt(fields[1]);
 
-                   
-                    System.out.println("\nType: " + transactionType + " | Amount: ₹" + amount + " | Date and Time : " + date + " | Status: " + status);
-                    foundTransactions = true;
-                }
-            }
+	            if (logUserId == userId && logAccountNo == accountNo) {
+	                String type = fields[2];
+	                double amount = Double.parseDouble(fields[3]);
+	                String date = fields[4];
+	                String status = fields[5];
 
-            if (!foundTransactions) {
-                System.out.println("\nNo transactions found for this account.");
-            }
+	                System.out.printf("Type: %-15s | Amount: ₹%-8.2f | Date: %-20s | Status: %s%n",
+	                        type, amount, date, status);
+	                found = true;
+	            }
+	        }
 
-        } catch (IOException e) {
-            System.out.println("\nError while reading transaction history: " + e.getMessage());
-        }
-    }
+	        if (!found) {
+	            System.out.println("\nNo transactions found for this account.");
+	        }
+
+	    } catch (IOException e) {
+	        System.out.println("Error reading transaction history: " + e.getMessage());
+	    }
+	}
 }
+
 
